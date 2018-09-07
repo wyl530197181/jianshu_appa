@@ -4,12 +4,12 @@
 import React, {Component} from 'react';
 import {HeaderWraper, Logo, Nav, NavItem, NavSearch, Addition, Button, SearchWrapper} from './styles.js'
 import {CSSTransition} from 'react-transition-group';
+import {connect} from 'react-redux';
 
-export default class Header extends Component {
+class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            focus: false,
         }
     }
 
@@ -25,20 +25,20 @@ export default class Header extends Component {
                 </NavItem>
                 <SearchWrapper>
                     <CSSTransition
-                        in={this.state.focus}
+                        in={this.props.focus}
                         timeout={200}
                         classNames={'slide'}
                     >
                         <NavSearch
-                            onFocus={() => {
-                                this.handleInputFoucus()
-                            }}
-                            onBlur={() => {
-                                this.handleInputBlur()
-                            }}
-                            className={this.state.focus ? 'focus' : ''}/>
+                            onFocus={
+                                this.props.handleInputFoucus
+                            }
+                            onBlur={
+                                this.props.handleInputBlur
+                            }
+                            className={this.props.focus ? 'focus' : ''}/>
                     </CSSTransition>
-                    <i className={this.state.focus ? 'focus iconfont' : 'iconfont'}>&#xe637;</i>
+                    <i className={this.props.focus ? 'focus iconfont' : 'iconfont'}>&#xe637;</i>
                 </SearchWrapper>
                 <Addition>
                     <Button className='writing'>
@@ -50,15 +50,28 @@ export default class Header extends Component {
         </HeaderWraper>)
     }
 
-    handleInputFoucus() {
-        this.setState({
-            focus: true
-        })
-    }
+}
 
-    handleInputBlur() {
-        this.setState({
-            focus: false
-        })
+const mapStateToProps = (state) => {//state 指的是state里面的数据
+    return {
+        focus:state.focus
     }
 }
+const mapDispatchToProps = (dispatch) => { // 组件和数据连接  相当于store.dispatch
+    return {
+        handleInputFoucus(){
+            const action={
+                type:'search_focus',
+            };
+            dispatch(action)
+        },
+        handleInputBlur(){
+            const action={
+                type:'search_blur',
+            };
+            dispatch(action)
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header)
