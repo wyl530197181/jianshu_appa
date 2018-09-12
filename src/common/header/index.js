@@ -5,12 +5,12 @@ import React, {Component} from 'react';
 import {HeaderWraper, Logo, Nav, NavItem, NavSearch, Addition, Button, SearchWrapper} from './styles.js'
 import {CSSTransition} from 'react-transition-group';
 import {connect} from 'react-redux';
+import {actionCreators } from './store';
 
 class Header extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-        }
+        this.state = {}
     }
 
     render() {
@@ -54,22 +54,16 @@ class Header extends Component {
 
 const mapStateToProps = (state) => {//state 指的是state里面的数据
     return {
-        focus:state.focus
+        focus: state.header.focus
     }
 }
 const mapDispatchToProps = (dispatch) => { // 组件和数据连接  相当于store.dispatch
     return {
-        handleInputFoucus(){
-            const action={
-                type:'search_focus',
-            };
-            dispatch(action)
+        handleInputFoucus() {
+            dispatch(actionCreators.searchFocus())
         },
-        handleInputBlur(){
-            const action={
-                type:'search_blur',
-            };
-            dispatch(action)
+        handleInputBlur() {
+            dispatch(actionCreators.searchBlur())
         }
     }
 }
