@@ -54,7 +54,7 @@ class Header extends Component {
 
 const mapStateToProps = (state) => {//state 指的是state里面的数据
     return {
-        focus: state.header.focus
+        focus: state.get('header').get('focus')
     }
 }
 const mapDispatchToProps = (dispatch) => { // 组件和数据连接  相当于store.dispatch
