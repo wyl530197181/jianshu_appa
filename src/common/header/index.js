@@ -2,10 +2,13 @@
  * Created by wangyl on 2018/9/3.
  */
 import React, {Component} from 'react';
-import {HeaderWraper, Logo, Nav, NavItem, NavSearch, Addition, Button, SearchWrapper} from './styles.js'
+import {
+    HeaderWraper, Logo, Nav, NavItem, NavSearch, Addition,
+    Button, SearchWrapper, SearchInfo, SearchInfoTitle, SearchInfoSwitch, SearchInfoItem
+} from './styles.js'
 import {CSSTransition} from 'react-transition-group';
 import {connect} from 'react-redux';
-import {actionCreators } from './store';
+import {actionCreators} from './store';
 
 class Header extends Component {
     constructor(props) {
@@ -39,6 +42,7 @@ class Header extends Component {
                             className={this.props.focus ? 'focus' : ''}/>
                     </CSSTransition>
                     <i className={this.props.focus ? 'focus iconfont' : 'iconfont'}>&#xe637;</i>
+                    {this.showInfoList(this.props.focus)}
                 </SearchWrapper>
                 <Addition>
                     <Button className='writing'>
@@ -50,16 +54,42 @@ class Header extends Component {
         </HeaderWraper>)
     }
 
+    showInfoList(show) {
+        if (show) {
+            return (
+                <SearchInfo>
+                    <SearchInfoTitle>
+                        热门搜索
+                        <SearchInfoSwitch>
+                            换一批
+                        </SearchInfoSwitch>
+                    </SearchInfoTitle>
+                    <div>
+                        {this.props.list && this.props.list.map((item, index) => {
+                            return (
+                                <SearchInfoItem key={index}>{item}</SearchInfoItem>
+
+                            )
+                        })}
+                    </div>
+                </SearchInfo>
+            )
+        } else {
+            return null
+        }
+    }
 }
 
 const mapStateToProps = (state) => {//state 指的是state里面的数据
     return {
-        focus: state.get('header').get('focus')
+        focus: state.get('header').get('focus'),
+        list: state.get('header').get('list')
     }
 }
 const mapDispatchToProps = (dispatch) => { // 组件和数据连接  相当于store.dispatch
     return {
         handleInputFoucus() {
+            dispatch(actionCreators.getList())
             dispatch(actionCreators.searchFocus())
         },
         handleInputBlur() {
