@@ -11,12 +11,8 @@ import {connect} from 'react-redux';
 import {actionCreators} from './store';
 
 class Header extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {}
-    }
-
     render() {
+
         return (<HeaderWraper>
             <Logo/>
             <Nav>
@@ -42,7 +38,7 @@ class Header extends Component {
                             className={this.props.focus ? 'focus' : ''}/>
                     </CSSTransition>
                     <i className={this.props.focus ? 'focus iconfont' : 'iconfont'}>&#xe637;</i>
-                    {this.showInfoList(this.props.focus)}
+                    {this.showInfoList()}
                 </SearchWrapper>
                 <Addition>
                     <Button className='writing'>
@@ -54,23 +50,35 @@ class Header extends Component {
         </HeaderWraper>)
     }
 
-    showInfoList(show) {
-        if (show) {
+    showInfoList() {
+        let pageList = [];
+        const jsList = this.props.list && this.props.list.toJS();
+        if (jsList.length) {
+            for (let i = (this.props.page - 1) * 10; i < this.props.page * 10; i++) {
+                pageList.push(
+                    <SearchInfoItem key={i}>{jsList[i]}</SearchInfoItem>
+                )
+            }
+        }
+        if (this.props.focus || this.props.mouseIn) {
             return (
-                <SearchInfo>
+                <SearchInfo onMouseEnter={
+                    this.props.handleMouseEnter
+                }
+                            onMouseLeave={
+                                this.props.handleMouseLeave
+                            }
+                >
                     <SearchInfoTitle>
                         热门搜索
-                        <SearchInfoSwitch>
+                        <SearchInfoSwitch
+                            onClick={() => {
+                                this.props.handleChangePage(this.props.page, this.props.totalPage)}}>
                             换一批
                         </SearchInfoSwitch>
                     </SearchInfoTitle>
                     <div>
-                        {this.props.list && this.props.list.map((item, index) => {
-                            return (
-                                <SearchInfoItem key={index}>{item}</SearchInfoItem>
-
-                            )
-                        })}
+                        {pageList}
                     </div>
                 </SearchInfo>
             )
@@ -83,7 +91,10 @@ class Header extends Component {
 const mapStateToProps = (state) => {//state 指的是state里面的数据
     return {
         focus: state.get('header').get('focus'),
-        list: state.get('header').get('list')
+        list: state.get('header').get('list'),
+        page: state.get('header').get('page'),
+        totalPage: state.get('header').get('totalPage'),
+        mouseIn: state.get('header').get('mouseIn'),
     }
 }
 const mapDispatchToProps = (dispatch) => { // 组件和数据连接  相当于store.dispatch
@@ -94,8 +105,21 @@ const mapDispatchToProps = (dispatch) => { // 组件和数据连接  相当于st
         },
         handleInputBlur() {
             dispatch(actionCreators.searchBlur())
+        },
+        handleMouseEnter() {
+            dispatch(actionCreators.mouseEnter())
+        },
+        handleMouseLeave() {
+            dispatch(actionCreators.mouseLeave())
+        },
+        handleChangePage(page, totalPage) {
+            if (page < totalPage) {
+                dispatch(actionCreators.changePage(page + 1))
+            } else {
+                dispatch(actionCreators.changePage(1))
+            }
         }
     }
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)
